@@ -10,6 +10,7 @@ IBTrACS and generating the windfields.
 ```python
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 from climada.hazard import Centroids, TCTracks, TropCyclone
 from shapely.geometry import LineString
@@ -20,8 +21,15 @@ import xarray as xr
 ```
 
 ```python
+load_dotenv()
+```
+
+```python
 DEG_TO_KM = 111.1  # Convert 1 degree to km
-input_dir = Path(os.getenv("STORM_DATA_DIR")) / "analysis/02_new_model_input"
+FJI_CRS = "+proj=longlat +ellps=WGS84 +lon_wrap=180 +datum=WGS84 +no_defs"
+input_dir = (
+    Path(os.getenv("STORM_DATA_DIR")) / "analysis/02_new_model_input_fji"
+)
 ```
 
 ## Get typhoon data
@@ -31,16 +39,42 @@ Typhoon IDs from IBTrACS are taken from
 
 ```python
 # Import list of typhoons to a dataframe
+WINSTON_ID = "2016041S14170"
+YASA_ID = "2020346S13168"
 typhoons_df = pd.read_csv(input_dir / "01_windfield/typhoons.csv")
 typhoons_df
 ```
 
 ```python
-# Download all tracks from the west pacific basin
+# Download all tracks from the south pacific basin
 sel_ibtracs = TCTracks.from_ibtracs_netcdf(
-    provider="usa", year_range=(2006, 2022), basin="WP"
+    year_range=(1970, 2022), basin="SP", provider="usa"
 )
 sel_ibtracs.size
+```
+
+```python
+# Load impact data
+df_impact = pd.read_csv(
+    input_dir / "02_housing_damage/input/fji_impact_data.csv"
+)
+print(df_impact)
+```
+
+```python
+df_tracks = pd.DataFrame()
+typhoon_ids = []
+
+for track in sel_ibtracs.data:
+    start_date = track.time.min()
+    eff_date = start_date - pd.Timedelta(days=200)
+    season = f"{eff_date.dt.year.values}/{eff_date.dt.year.values + 1}"
+    name_season = track.name.capitalize() + " " + season
+    if name_season in df_impact["Name Season"]:
+        typhoon_ids.append(track.sid)
+    track.attrs[
+        "season"
+    ] = f"{eff_date.dt.year.values}/{eff_date.dt.year.values + 1}"
 ```
 
 ```python
@@ -48,7 +82,9 @@ sel_ibtracs.size
 # on the track ID. Interpolate from 3 hours to
 # 30 minute intervals to create a smooth intensity field.
 tc_tracks = TCTracks()
-for typhoon_id in typhoons_df["typhoon_id"]:
+cyclone_ids = [WINSTON_ID, YASA_ID]
+# typhoon_ids = typhoons_df["typhoon_id"]
+for typhoon_id in typhoon_ids:
     tc_track = sel_ibtracs.get_track(typhoon_id)
     tc_track = tc_track.interp(
         time=pd.date_range(
@@ -79,21 +115,25 @@ used for all other grid-based data.
 
 filepath = (
     input_dir
-    / "02_housing_damage/output/phl_0.1_degree_grid_centroids_land_overlap.gpkg"
+    / "02_housing_damage/output/fji_0.1_degree_grid_centroids_land_overlap.gpkg"
 )
 gdf = gpd.read_file(filepath)
 gdf["id"] = gdf["id"].astype(int)
 
-gdf
+gdf.to_crs(epsg=4326)
 ```
 
 ```python
 # multipolygon data to centroids
 
-cent = Centroids.from_geodataframe(gpd.read_file(filepath))
+cent = Centroids.from_geodataframe(gdf.to_crs(epsg=4326))
 
 cent.check()
 cent.plot();
+```
+
+```python
+cent.crs
 ```
 
 ```python
@@ -105,12 +145,16 @@ tc = TropCyclone.from_tracks(
 ```
 
 ```python
+tc.plot_fraction(YASA_ID)
+```
+
+```python
 # Let's look at a specific typhoon as an example.
 # It looks weird but I think it's just a
 # projection issue, as the parts on land look fine
 example_typhoon_id = "2020299N11144"  # Goni 2020
 # example_typhoon_id = "2019354N05151"  # Phanfone
-tc.plot_intensity(example_typhoon_id)
+tc.plot_intensity(YASA_ID)
 ```
 
 ## Save the windfields
@@ -155,7 +199,7 @@ df_windfield
 ```python
 # Check that that the grid points match for the example typhoon.
 # Looks good to me!
-df_example = df_windfield[df_windfield["typhoon_id"] == example_typhoon_id]
+df_example = df_windfield[df_windfield["typhoon_id"] == WINSTON_ID]
 gdf_example = gdf.merge(df_example, left_on="id", right_on="grid_point_id")
 gdf_example.plot(c=gdf_example["wind_speed"])
 ```
@@ -170,4 +214,8 @@ df_windfield.plot.scatter("track_distance", "wind_speed")
 ```python
 # Save df as a csv file
 df_windfield.to_csv(input_dir / "01_windfield/windfield_data.csv")
+```
+
+```python
+
 ```
