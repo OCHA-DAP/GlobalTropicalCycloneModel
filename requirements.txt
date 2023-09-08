@@ -6,7 +6,7 @@ jupyter==1.0.0
 jupyter-black==0.3.1
 jupytext==1.14.1
 matplotlib==3.5.2
-numpy==1.21.5
+numpy==1.21.0
 ocha-anticipy==1.0.0
 pandas==1.4.4
 pre-commit==2.20.0
