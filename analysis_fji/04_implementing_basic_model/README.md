@@ -3,15 +3,15 @@
 
 ## Report: .py codes
 
-### Code: creating_grid.py
+### Code: *creating_grid.py*
 
 Here we automatise the creation of grid cells on Fiji. We don't use it for predictions, but it is there to, in the future, create grid cells for every location of the world.
 
-### Code: utils.py
+### Code: *utils.py*
 
 Here we create a repository for calling functions to load datasets. For example, we use it to load the Philippines Dataset, the Fiji dataset, and the combined dataset.
 
-### Code: input_dataset.py
+### Code: *input_dataset.py*
 
 Here we create 2 important functions:
 -  create_windfield_dataset()
@@ -22,7 +22,7 @@ Here we create 2 important functions:
 
 ```create_input_dataset()``` takes the output of ```create_windfield_dataset()``` and just consider the forecasts that took place in Fiji. Also, it merges this windspeed data with all the other stationary features defined in *03_new_model_training/01_collage_data.ipynb*.
 
-### Code: predict_damage.py
+### Code: *predict_damage.py*
 
 Here we define the function ```apply_model()```. This function considers as input a list of datasets (in our case: windfield data + stationary features for various forecasts) and applies a weighted XGBoost model with training data from Fiji + Philippines datasets. This function predicts damage for every input dataset at grid level and it then transforms the damage to municipality level.
 
