@@ -18,13 +18,13 @@ def load_datasets():
         }, axis=1)
     df_fji = df_combined[df_combined.country == 'fji']
 
-    # Features NO Rainfall
+    # Features with Rainfall
     features_drop = [
         "wind_speed",
         "track_distance",
         "total_buildings",
-        #"rainfall_max_6h",
-        #"rainfall_max_24h",
+        "rainfall_max_6h",
+        "rainfall_max_24h",
         "coast_length",
         "with_coast",
         "mean_altitude",

@@ -13,14 +13,21 @@ Here we create a repository for calling functions to load datasets. For example,
 
 ### Code: *input_dataset.py*
 
-Here we create 2 important functions:
--  create_windfield_dataset()
+Here we create 3 important functions:
+-  create_windfield_dataset(thres)
+-  create_rainfall_dataset()
 -  create_input_dataset()
 
 
 ```create_windfield_dataset()``` loads ECMWF real-time forecasts, and merge it with the grid cells dataset that we have defined in *02_new_model_input*. Also if the forecast event took place in Fiji, a new feature *in_fiji* is set True. To define the Fiji region, we create a polygon (a square) with a custom size and if any point of the forecast track falls into this square, we automatically set that forecast as Fiji-related. The user can obviously play with the dimension of this square.
 
-```create_input_dataset()``` takes the output of ```create_windfield_dataset()``` and just consider the forecasts that took place in Fiji. Also, it merges this windspeed data with all the other stationary features defined in *03_new_model_training/01_collage_data.ipynb*.
+Also, the user can set a threshold in hours (thres): this threshold let the user to just consider datapoints up to a certain time in hours starting from the collection datetime of the data. The default value is 120h. So every wind forecast that the ECMWF provides is cut to just consider wind paths that just contemplates datapoints values up to 120h. Also, a wind path is considered just if it has at least 4 datapoints.
+
+
+```create_windfield_dataset()``` uses NOMADS real-time rainfall data and compute the max rainfall accumulated in 6h and 24h periods for every grid cell. The output is a .csv of rainfall data for each wind event event that takes place in Fiji.
+
+
+```create_input_dataset()``` takes the output of ```create_windfield_dataset()``` and ```create_windfield_dataset()`` and just consider the forecasts that took place in Fiji. Also, it merges this windspeed data with all the other stationary features defined in *03_new_model_training/01_collage_data.ipynb*.
 
 ### Code: *predict_damage.py*
 
@@ -37,5 +44,7 @@ Here we define the function ```apply_model()```. This function considers as inpu
 - In *wind_to_grid_experiment.ipynb* we play with getting windspeed data in every position based on forecasts dataset not provided by the ECMWF. Since it's a failure, I'm not consider any of what it's written in this notebook. We keep it for completeness.
 
 - In *wind_to_grid_ECMWF.ipynb* we consider ECMWF data and we define the approach that we are later going to define in the ```create_windfield_dataset()``` function in the *input_dataset.py* file.
+
+- In *rainfall_data.ipynb* is everything regarding the rainfall forecast data: the downloading and the processing of the data.
 
 - In *apply_model.ipynb* we have 2 sections: Manual process and Automated Process. The Manual section is left for completeness but I encourage anyone to use the Automated Process section. In this section we use all the functions that we have already defined to predict damage at municipality-level based on ECMWF forecasts in Fiji.

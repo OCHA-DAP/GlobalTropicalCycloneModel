@@ -3,29 +3,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from xgboost.sklearn import XGBRegressor
+from pathlib import Path
+import os
+from datetime import datetime
 
 from utils import get_combined_dataset, get_municipality_grids
-from input_dataset import create_input_dataset, create_windfield_dataset
+from input_dataset import create_input_dataset, create_windfield_dataset, create_rainfall_dataset
 from predict_damage import apply_model
 ```
 
-
-    ---------------------------------------------------------------------------
-
-    ModuleNotFoundError                       Traceback (most recent call last)
-
-    Cell In[1], line 4
-          2 import numpy as np
-          3 import pandas as pd
-    ----> 4 from xgboost.sklearn import XGBRegressor
-          6 from utils import get_combined_dataset, get_municipality_grids
-          7 from input_dataset import create_input_dataset, create_windfield_dataset
-
-
-    ModuleNotFoundError: No module named 'xgboost'
-
-
-## Manual proccess
+## Manual proccess (rainfall data not contemplated)
 
 
 ```python
@@ -1548,7 +1535,6 @@ df_windfield = create_windfield_dataset()
 # Merging windspeed data with stationary data
 df_input = create_input_dataset(df_windfield)
 df_input
-
 ```
 
 
@@ -1827,41 +1813,99 @@ for forecast in list_forecast:
         }, axis=1)
 
     list_df_out.append(dmg_by_mun)
-
-
-
 ```
 
-## Automated proccess
+## Automated proccess (includes rainfall data)
 
 
 ```python
-# Getting data from ECMWF
-df_windfield = create_windfield_dataset()
+# Getting data from ECMWF (takes 40s to run aprox)
+df_windfield = create_windfield_dataset(thres=120)
 ```
 
-    Download: 100%|██████████| 36/36 [00:27<00:00,  1.32 files/s]
-    Processing:  31%|███       | 11/36 [00:01<00:03,  7.72 files/s]
+    /Users/federico/Library/CloudStorage/OneDrive-Personal/Documentos/ISI_Project/FIJI clean/analysis_fji/04_implementing_basic_model/input_dataset.py:35: UserWarning: Geometry is in a geographic CRS. Results from 'centroid' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
 
-    2023-11-01 23:17:13,850 - climada_petals.hazard.tc_tracks_forecast - WARNING - Maximum 10m wind at time 36: only 1 variable value for 2 ensemble members, duplicating value to all members. This is only acceptable for lat and lon data at time 0.
+      grids.geometry = grids.geometry.to_crs(grids.crs).centroid
+    Download: 100%|██████████| 32/32 [00:02<00:00, 12.21 files/s]
+    Processing: 100%|██████████| 32/32 [00:02<00:00, 11.19 files/s]
 
-
-    Processing: 100%|██████████| 36/36 [00:03<00:00,  9.18 files/s]
-
-    2023-11-01 23:17:16,030 - climada.hazard.centroids.centr - WARNING - Centroids.from_geodataframe has been deprecated and will be removed in a future version. Use ther default constructor instead.
+    2023-11-20 17:29:39,847 - climada.hazard.centroids.centr - WARNING - Centroids.from_geodataframe has been deprecated and will be removed in a future version. Use ther default constructor instead.
 
 
 
-    /Users/federico/anaconda3/envs/env6/lib/python3.11/site-packages/shapely/measurement.py:72: RuntimeWarning: invalid value encountered in distance
-      return lib.distance(a, b, **kwargs)
-    /Users/federico/anaconda3/envs/env6/lib/python3.11/site-packages/shapely/measurement.py:72: RuntimeWarning: invalid value encountered in distance
-      return lib.distance(a, b, **kwargs)
 
+
+
+```python
+# Check if some forecasts take place on Fiji
+df_windfield[df_windfield.in_fiji == True]
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>event_id_ecmwf</th>
+      <th>unique_id</th>
+      <th>basins</th>
+      <th>time_init</th>
+      <th>time_end</th>
+      <th>in_fiji</th>
+      <th>grid_point_id</th>
+      <th>wind_speed</th>
+      <th>track_distance</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Get rainfall data (might take a couple of minutes- more like ~4 minutes)
+df_rainfall = create_rainfall_dataset(df_windfield)
+```
+
+    Downloading  https://nomads.ncep.noaa.gov/pub/data/nccf/com/naefs/prod/gefs.20231120/06/prcp_bc_gb2/
+
+
+
+```python
+# Load rainfall data (only if there are some wind forecasts on Fiji)
+rain_dir = (
+    Path(os.getenv("STORM_DATA_DIR"))
+    / "analysis_fji/02_new_model_input/03_rainfall/output"
+)
+today = datetime.now().strftime("%Y%m%d")
+filename = rain_dir / "NOMADS"/ today /"rainfall_data_rw_mean.csv"
+df_rainfall = pd.read_csv(filename)
+```
 
 
 ```python
 # Merging windspeed data with stationary data
-df_input = create_input_dataset(df_windfield)
+df_input = create_input_dataset(df_windfield, df_rainfall)
 
 # Group the DataFrame by the 'unique_id' column
 grouped = df_input.groupby('unique_id')
@@ -1923,107 +1967,107 @@ list_output[0]
     <tr>
       <th>0</th>
       <td>Ba</td>
-      <td>0.001386</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.014184</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>1</th>
       <td>Bua</td>
-      <td>0.001756</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>-0.010197</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>2</th>
       <td>Cakaudrove</td>
-      <td>0.000000</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>-0.010138</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>3</th>
       <td>Kadavu</td>
-      <td>0.000000</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.029455</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>4</th>
       <td>Lau</td>
-      <td>0.000157</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>-0.010547</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>5</th>
       <td>Lomaiviti</td>
-      <td>0.000000</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>-0.006072</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>6</th>
       <td>Macuata</td>
-      <td>0.008340</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>-0.012121</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>7</th>
       <td>Nadroga/Navosa</td>
-      <td>0.000000</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.104006</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>8</th>
       <td>Naitasiri</td>
-      <td>0.007406</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.012073</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>9</th>
       <td>Namosi</td>
-      <td>0.001724</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.011827</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>10</th>
       <td>Ra</td>
-      <td>0.004238</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.010899</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>11</th>
       <td>Rewa</td>
-      <td>0.014047</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>-0.003083</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>12</th>
       <td>Rotuma</td>
-      <td>0.001382</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>-0.012672</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>13</th>
       <td>Serua</td>
-      <td>0.000000</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.041130</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
     <tr>
       <th>14</th>
       <td>Tailevu</td>
-      <td>0.000662</td>
-      <td>2023-11-01 12:00:00</td>
-      <td>2023-11-11 12:00:00</td>
+      <td>0.008783</td>
+      <td>2023-11-13</td>
+      <td>2023-11-16 18:00:00</td>
     </tr>
   </tbody>
 </table>

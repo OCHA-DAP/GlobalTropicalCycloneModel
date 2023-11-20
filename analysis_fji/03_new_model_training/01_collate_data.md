@@ -32,7 +32,6 @@ df_damage = pd.read_csv(filename)
 # Read in buildings per grid
 filename = input_dir / "02_housing_damage/output/num_building_bygrid.csv"
 df_buildings_raw = pd.read_csv(filename)
-
 ```
 
 
@@ -829,8 +828,8 @@ df_rainfall
       <td>ANA</td>
       <td>2021</td>
       <td>5122</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.666667</td>
+      <td>0.362500</td>
       <td>181.55E_-19.15N</td>
     </tr>
     <tr>
@@ -838,8 +837,8 @@ df_rainfall
       <td>ANA</td>
       <td>2021</td>
       <td>5123</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.766667</td>
+      <td>0.422917</td>
       <td>181.55E_-19.25N</td>
     </tr>
     <tr>
@@ -847,8 +846,8 @@ df_rainfall
       <td>ANA</td>
       <td>2021</td>
       <td>5221</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.675000</td>
+      <td>0.360417</td>
       <td>181.65E_-18.95N</td>
     </tr>
     <tr>
@@ -856,8 +855,8 @@ df_rainfall
       <td>ANA</td>
       <td>2021</td>
       <td>5223</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.900000</td>
+      <td>0.437500</td>
       <td>181.65E_-19.15N</td>
     </tr>
     <tr>
@@ -865,8 +864,8 @@ df_rainfall
       <td>ANA</td>
       <td>2021</td>
       <td>5331</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>1.483333</td>
+      <td>0.783333</td>
       <td>181.75E_-19.85N</td>
     </tr>
   </tbody>
@@ -1165,8 +1164,8 @@ df_all
       <td>6.500000</td>
       <td>0.0</td>
       <td>2019</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>2.741667</td>
+      <td>1.158333</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1186,8 +1185,8 @@ df_all
       <td>0.000000</td>
       <td>0.0</td>
       <td>2020</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.233333</td>
+      <td>0.058333</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1207,8 +1206,8 @@ df_all
       <td>185.000000</td>
       <td>0.0</td>
       <td>2020</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.508333</td>
+      <td>0.166667</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1228,8 +1227,8 @@ df_all
       <td>NaN</td>
       <td>NaN</td>
       <td>2020</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>0.491667</td>
+      <td>0.131250</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1249,8 +1248,8 @@ df_all
       <td>0.000000</td>
       <td>0.0</td>
       <td>2021</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>1.483333</td>
+      <td>0.783333</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1468,8 +1467,8 @@ df_complete
       <td>6.500000</td>
       <td>0.0</td>
       <td>2019</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
+      <td>2.741667</td>
+      <td>1.158333</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1490,8 +1489,8 @@ df_complete
       <td>0.000000</td>
       <td>0.0</td>
       <td>2020</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
+      <td>0.233333</td>
+      <td>0.058333</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1512,8 +1511,8 @@ df_complete
       <td>185.000000</td>
       <td>0.0</td>
       <td>2020</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
+      <td>0.508333</td>
+      <td>0.166667</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1534,8 +1533,8 @@ df_complete
       <td>0.000000</td>
       <td>0.0</td>
       <td>2020</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
+      <td>0.491667</td>
+      <td>0.131250</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1556,8 +1555,8 @@ df_complete
       <td>0.000000</td>
       <td>0.0</td>
       <td>2021</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
+      <td>1.483333</td>
+      <td>0.783333</td>
       <td>181.75E_-19.85N</td>
       <td>71.4</td>
       <td>0</td>
@@ -1899,8 +1898,8 @@ df.sort_values('perc_dmg_grid', ascending=False)
       <td>0.0</td>
       <td>0.000000</td>
       <td>2021</td>
-      <td>0.000000</td>
-      <td>0.000000</td>
+      <td>0.666667</td>
+      <td>0.362500</td>
       <td>181.55E_-19.15N</td>
       <td>71.4</td>
       <td>76</td>
@@ -2000,8 +1999,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>0.0</td>
       <td>0.000000</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
       <td>176.95E_-17.15N</td>
       <td>86.0</td>
       <td>213</td>
@@ -2020,8 +2019,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>0.0</td>
       <td>0.000000</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
       <td>177.05E_-17.55N</td>
       <td>76.1</td>
       <td>332</td>
@@ -2040,8 +2039,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>0.0</td>
       <td>0.000000</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
       <td>177.05E_-17.65N</td>
       <td>76.1</td>
       <td>233</td>
@@ -2060,8 +2059,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>0.0</td>
       <td>0.000000</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
       <td>177.15E_-17.15N</td>
       <td>86.0</td>
       <td>76</td>
@@ -2080,8 +2079,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>0.0</td>
       <td>0.000000</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
       <td>177.15E_-17.25N</td>
       <td>86.0</td>
       <td>334</td>
@@ -2120,8 +2119,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>7.0</td>
       <td>0.002697</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.050000</td>
+      <td>0.012500</td>
       <td>181.45E_-18.65N</td>
       <td>71.4</td>
       <td>180</td>
@@ -2140,8 +2139,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>7.0</td>
       <td>0.002742</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.008333</td>
+      <td>0.002083</td>
       <td>181.45E_-19.15N</td>
       <td>71.4</td>
       <td>183</td>
@@ -2160,8 +2159,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>7.0</td>
       <td>0.002427</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.016667</td>
+      <td>0.004167</td>
       <td>181.55E_-18.45N</td>
       <td>71.4</td>
       <td>162</td>
@@ -2180,8 +2179,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>7.0</td>
       <td>0.001498</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.025000</td>
+      <td>0.006250</td>
       <td>181.55E_-18.65N</td>
       <td>71.4</td>
       <td>100</td>
@@ -2200,8 +2199,8 @@ df[df.index.get_level_values('typhoon_name') == 'GITA']
       <td>7.0</td>
       <td>0.001139</td>
       <td>2018</td>
-      <td>0.0</td>
-      <td>0.0</td>
+      <td>0.008333</td>
+      <td>0.002083</td>
       <td>181.55E_-19.15N</td>
       <td>71.4</td>
       <td>76</td>
