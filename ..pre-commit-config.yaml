@@ -1,5 +1,0 @@
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
-    hooks:
-    -   id: check-added-large-files
-        args: ['--maxkb=0']  # Set the limit to 0 KB for no restriction
