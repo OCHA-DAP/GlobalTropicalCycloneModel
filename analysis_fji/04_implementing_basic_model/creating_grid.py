@@ -9,19 +9,17 @@ import pandas as pd
 input_dir = (
     Path(os.getenv("STORM_DATA_DIR"))
     / "analysis_fji/02_new_model_input/02_housing_damage/input/"
-    )
+)
 
 # Load Fiji
-adm2_shp = gpd.read_file(
-    input_dir / "adm2_shp_fixed.gpkg"
-)
-adm2_shp = adm2_shp.to_crs('EPSG:4326')
-#%%
+adm2_shp = gpd.read_file(input_dir / "adm2_shp_fixed.gpkg")
+adm2_shp = adm2_shp.to_crs("EPSG:4326")
+# %%
+
 
 def create_fji_grid():
-
     # Grid creation
-    xmin, xmax, ymin, ymax = 176, 182, -21, -12 # Fiji extremes coordintates
+    xmin, xmax, ymin, ymax = 176, 182, -21, -12  # Fiji extremes coordintates
 
     cell_size = 0.1
 
@@ -47,12 +45,11 @@ def create_fji_grid():
     # Intersection of grid and shapefile
     adm2_grid_intersection = gpd.overlay(adm2_shp, grid, how="identity")
 
-
     # Grid land overlap
     grid_land_overlap = grid.loc[grid["id"].isin(adm2_grid_intersection["id"])]
 
     # Grids per municipality
-    grid_muni = gpd.sjoin(adm2_shp, grid_land_overlap, how='inner')
-    grid_muni = grid_muni.drop_duplicates(subset=['id'])
+    grid_muni = gpd.sjoin(adm2_shp, grid_land_overlap, how="inner")
+    grid_muni = grid_muni.drop_duplicates(subset=["id"])
 
-    return grid, grid_land_overlap ,grid_muni
+    return grid, grid_land_overlap, grid_muni

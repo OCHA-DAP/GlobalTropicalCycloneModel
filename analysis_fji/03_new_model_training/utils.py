@@ -11,19 +11,24 @@ RS_BASE = 12345
 
 # -
 
+
 def get_training_dataset():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR"))
+        / "analysis_fji/03_new_model_training"
     )
     filename = input_dir / "new_model_training_dataset_fji.csv"
     return pd.read_csv(filename)
 
+
 def get_training_dataset_complete():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR"))
+        / "analysis_fji/03_new_model_training"
     )
     filename = input_dir / "new_model_training_dataset_fji_complete.csv"
     return pd.read_csv(filename)
+
 
 def get_training_dataset_phl():
     input_dir = (
@@ -32,9 +37,11 @@ def get_training_dataset_phl():
     filename = input_dir / "new_model_training_dataset.csv"
     return pd.read_csv(filename)
 
+
 def get_stationary_data_fiji():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR"))
+        / "analysis_fji/03_new_model_training"
     )
     filename = input_dir / "fiji_stationary_data.csv"
     return pd.read_csv(filename)
@@ -46,10 +53,13 @@ def get_combined_dataset():
     df_phl = get_training_dataset_phl()
     # Standardized features names
     df_fji = df_fji.rename(
-        {'perc_dmg_grid':'percent_houses_damaged',
-         'total_buildings':'total_houses',
-         'mean_altitude':'mean_elev'},
-         axis=1)
+        {
+            "perc_dmg_grid": "percent_houses_damaged",
+            "total_buildings": "total_houses",
+            "mean_altitude": "mean_elev",
+        },
+        axis=1,
+    )
     all_features = [
         "wind_speed",
         "track_distance",
@@ -60,23 +70,31 @@ def get_combined_dataset():
         "with_coast",
         "mean_elev",
         "mean_slope",
-        #"IWI",
+        # "IWI",
         "country",
         "percent_houses_damaged",
-        "typhoon_name"]
+        "typhoon_name",
+    ]
     # New feature 'country'
-    df_phl['country'] = 'phl'
-    df_fji['country'] = 'fji'
+    df_phl["country"] = "phl"
+    df_fji["country"] = "fji"
 
     # All together
-    df_combined = pd.concat([df_phl[all_features], df_fji[all_features]], axis=0)
+    df_combined = pd.concat(
+        [df_phl[all_features], df_fji[all_features]], axis=0
+    )
 
     # Set any values of damage houses >100% to 100%
-    df_combined.loc[df_combined["percent_houses_damaged"] > 100, "percent_houses_damaged"] = 100
+    df_combined.loc[
+        df_combined["percent_houses_damaged"] > 100, "percent_houses_damaged"
+    ] = 100
 
     return df_combined
 
-def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weight):
+
+def xgb_model_combined_data_LOOCV(
+    df_combined, df_fji, features, bins, fji_weight
+):
     # Dataframe Fiji
 
     fji_typhoons = df_fji.typhoon_name.unique()
@@ -89,19 +107,22 @@ def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weigh
     rmse_bin_fji = []
     avg_error_bin_fji = []
 
-    y_test_typhoon_fji  = []
-    y_pred_typhoon_fji  = []
+    y_test_typhoon_fji = []
+    y_pred_typhoon_fji = []
 
     for typhoon in fji_typhoons:
-
-        """ PART 1: Train/Test """
+        """PART 1: Train/Test"""
 
         # LOOCV
-        df_test = df_fji[df_fji["typhoon_name"] == typhoon] # Test set: Fiji
-        df_train = df_combined[df_combined["typhoon_name"] != typhoon] # Train set: everything
+        df_test = df_fji[df_fji["typhoon_name"] == typhoon]  # Test set: Fiji
+        df_train = df_combined[
+            df_combined["typhoon_name"] != typhoon
+        ]  # Train set: everything
 
         # Class weight
-        weights = np.where(df_train['country'] == 'phl', 1, fji_weight) # Let's give more weight to Fiji
+        weights = np.where(
+            df_train["country"] == "phl", 1, fji_weight
+        )  # Let's give more weight to Fiji
 
         # Split X and y from dataframe features
         X_test = df_test[features]
@@ -145,10 +166,15 @@ def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weigh
             random_state=0,
         )
 
-
         # fit it on the training set
         eval_set = [(X_train, y_train)]
-        xgb.fit(X_train, y_train, eval_set=eval_set, verbose=False, sample_weight=weights) #xgb_model
+        xgb.fit(
+            X_train,
+            y_train,
+            eval_set=eval_set,
+            verbose=False,
+            sample_weight=weights,
+        )  # xgb_model
 
         # make predictions on Fiji
         y_pred_fji = xgb.predict(X_test)
@@ -166,13 +192,22 @@ def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weigh
         rmse_test_bin = []
         avg_error_bin = []
         for bin_num in range(num_bins)[1:]:
-            if (len(y_test[bin_index_test == bin_num]) != 0 and len(y_pred_fji[bin_index_test == bin_num]) != 0):
+            if (
+                len(y_test[bin_index_test == bin_num]) != 0
+                and len(y_pred_fji[bin_index_test == bin_num]) != 0
+            ):
                 # Estimation of RMSE for test data per each bin
-                mse_test = mean_squared_error(y_test[bin_index_test == bin_num], y_pred_fji[bin_index_test == bin_num])
+                mse_test = mean_squared_error(
+                    y_test[bin_index_test == bin_num],
+                    y_pred_fji[bin_index_test == bin_num],
+                )
                 rmse_test = np.sqrt(mse_test)
                 rmse_test_bin.append(rmse_test)
                 # Avg error
-                mean_difference = np.mean(y_test[bin_index_test == bin_num] - y_pred_fji[bin_index_test == bin_num])
+                mean_difference = np.mean(
+                    y_test[bin_index_test == bin_num]
+                    - y_pred_fji[bin_index_test == bin_num]
+                )
                 avg_error_bin.append(mean_difference)
             else:
                 rmse_test_bin.append(np.nan)
@@ -185,11 +220,16 @@ def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weigh
     rmse_strat_fji = []
     avg_error_strat_fji = []
     for i in range(num_bins - 1):
-        #RMSE
-        test_rmse_bin = np.nanmean(np.array(rmse_bin_fji)[:,i])
+        # RMSE
+        test_rmse_bin = np.nanmean(np.array(rmse_bin_fji)[:, i])
         rmse_strat_fji.append(test_rmse_bin)
-        #AVG error
-        test_avg_bin = np.nanmean(np.array(avg_error_bin_fji)[:,i])
+        # AVG error
+        test_avg_bin = np.nanmean(np.array(avg_error_bin_fji)[:, i])
         avg_error_strat_fji.append(test_avg_bin)
 
-    return y_test_typhoon_fji, y_pred_typhoon_fji, rmse_strat_fji, avg_error_strat_fji
+    return (
+        y_test_typhoon_fji,
+        y_pred_typhoon_fji,
+        rmse_strat_fji,
+        avg_error_strat_fji,
+    )

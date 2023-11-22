@@ -6,17 +6,18 @@ from xgboost.sklearn import XGBRegressor
 from utils import get_combined_dataset, get_municipality_grids
 from input_dataset import create_input_dataset, create_windfield_dataset
 
+
 def load_datasets():
     # Load grids by municipality
-    grid_mun = get_municipality_grids()[['id','NAME_2']]
+    grid_mun = get_municipality_grids()[["id", "NAME_2"]]
 
     # Load dataset
     df_combined = get_combined_dataset()
-    df_combined = df_combined.rename({
-        'mean_elev':'mean_altitude',
-        'total_houses':'total_buildings'
-        }, axis=1)
-    df_fji = df_combined[df_combined.country == 'fji']
+    df_combined = df_combined.rename(
+        {"mean_elev": "mean_altitude", "total_houses": "total_buildings"},
+        axis=1,
+    )
+    df_fji = df_combined[df_combined.country == "fji"]
 
     # Features with Rainfall
     features_drop = [
@@ -32,11 +33,12 @@ def load_datasets():
     ]
     return grid_mun, df_combined, features_drop
 
+
 def apply_model(list_forecast):
     # Load datasets from Fiji and Philippines
     grid_mun, df_combined, features_drop = load_datasets()
 
-    #Fiji weight
+    # Fiji weight
     fji_weight = 2
     list_df_out = []
     for forecast in list_forecast:
@@ -45,7 +47,9 @@ def apply_model(list_forecast):
         df_train = df_combined.copy()
 
         # Class weight
-        weights = np.where(df_train['country'] == 'phl', 1, fji_weight) # Let's give more weight to Fiji
+        weights = np.where(
+            df_train["country"] == "phl", 1, fji_weight
+        )  # Let's give more weight to Fiji
 
         # Split X and y from dataframe features
         X_test = df_test[features_drop]
@@ -85,23 +89,33 @@ def apply_model(list_forecast):
 
         # Fit it on the training set
         eval_set = [(X_train, y_train)]
-        xgb_model = xgb.fit(X_train, y_train, eval_set=eval_set, verbose=False, sample_weight=weights) #xgb_model
+        xgb_model = xgb.fit(
+            X_train,
+            y_train,
+            eval_set=eval_set,
+            verbose=False,
+            sample_weight=weights,
+        )  # xgb_model
 
         # Make predictions on new data
         y_pred = xgb.predict(X_test)
 
         # Join with forecast
-        df_test['perc_dmg_pred'] = y_pred
+        df_test["perc_dmg_pred"] = y_pred
 
         # Set damage predicted < 0 to 0 -- Just if you want -- In some extreme cases (typhoons), the damage is always > 0
-        #df_test.loc[df_test['perc_dmg_pred'] < 0, 'perc_dmg_pred'] = 0
+        # df_test.loc[df_test['perc_dmg_pred'] < 0, 'perc_dmg_pred'] = 0
 
         # Agreggate by municipality
-        dmg_by_mun = grid_mun.merge(df_test, left_on='id', right_on='grid_point_id')[
-            ['NAME_2','perc_dmg_pred']
-            ].groupby('NAME_2').mean().reset_index().rename({
-                'NAME_2':'municipality'
-            }, axis=1)
+        dmg_by_mun = (
+            grid_mun.merge(df_test, left_on="id", right_on="grid_point_id")[
+                ["NAME_2", "perc_dmg_pred"]
+            ]
+            .groupby("NAME_2")
+            .mean()
+            .reset_index()
+            .rename({"NAME_2": "municipality"}, axis=1)
+        )
 
         list_df_out.append(dmg_by_mun)
     return list_df_out
