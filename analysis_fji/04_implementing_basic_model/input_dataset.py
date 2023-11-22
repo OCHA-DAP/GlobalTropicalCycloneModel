@@ -1,32 +1,26 @@
-import pandas as pd
+import os
+import warnings
+from datetime import datetime, timedelta
+from pathlib import Path
+
 import geopandas as gpd
 import numpy as np
-import xarray as xr
-import os
-from pathlib import Path
-from shapely.geometry import LineString, Point, Polygon
-from climada.hazard import Centroids, TCTracks, TropCyclone, Hazard
+import pandas as pd
+import rasterio
+import requests
+from bs4 import BeautifulSoup
+from climada.hazard import Centroids, TropCyclone
 from climada_petals.hazard import TCForecast
-import warnings
+from rasterstats import zonal_stats
+from shapely.geometry import LineString, Polygon
+from utils import get_stationary_data_fiji
 
 # Filter out specific UserWarning by message
 warnings.filterwarnings(
     "ignore",
-    message="Converting non-nanosecond precision datetime values to nanosecond precision",
+    message="Converting non-nanosecond precision datetime values to "
+    "nanosecond precision",
 )
-
-from datetime import datetime, timedelta
-import time
-import datetime as dt
-from bs4 import BeautifulSoup
-import requests
-
-from shapely.geometry import Polygon
-import rasterio
-from rasterio.features import geometry_mask
-from rasterstats import zonal_stats
-
-from utils import get_stationary_data_fiji
 
 
 def create_windfield_dataset(thres=120):
@@ -48,7 +42,7 @@ def create_windfield_dataset(thres=120):
     # Modify each of the event based on threshold
     n_events = len(tc_fcast.data)
     # Threshold
-    thres = 120  # h
+    # thres = 120  # h
     today = datetime.now()
     # Calculate the threshold datetime from the current date and time
     threshold_datetime = np.datetime64(today + timedelta(hours=thres))
@@ -66,7 +60,8 @@ def create_windfield_dataset(thres=120):
         else:
             continue
 
-    # Create TropCyclone class with modified data (Predict Windfield on centroids)
+    # Create TropCyclone class with modified data
+    # (Predict Windfield on centroids)
     cent = Centroids.from_geodataframe(grids)
     tc_fcast_mod = TCForecast(xarray_data_list)
     tc = TropCyclone.from_tracks(
@@ -136,7 +131,10 @@ def download_gefs_data(download_folder):
     folder_names = [f"{today}/18", f"{today}/12", f"{today}/06", f"{today}/00"]
 
     for folder in folder_names:
-        url = f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/naefs/prod/gefs.{folder}/prcp_bc_gb2/"
+        url = (
+            f"https://nomads.ncep.noaa.gov/pub/data/nccf/com/naefs/"
+            f"prod/gefs.{folder}/prcp_bc_gb2/"
+        )
         response = requests.get(url)
 
         if response.status_code == 200:
@@ -198,7 +196,7 @@ def create_rainfall_dataset(df_windfield):
     )
 
     # Focus on Fiji
-    fiji_forecast = df_windfield[df_windfield.in_fiji == True]
+    fiji_forecast = df_windfield[df_windfield.in_fiji]
 
     # Group the DataFrame by the 'unique_id' column
     grouped = fiji_forecast.groupby("unique_id")
@@ -269,7 +267,7 @@ def create_rainfall_dataset(df_windfield):
                 grid_transformed,
                 array,
                 stats=stats_list,
-                nodata=-999,  # There's no specificaiton on this, so we invent a number
+                nodata=-999,  # There's no spec on this, so we invent a number
                 all_touched=True,
                 affine=input_raster.transform,
             )
@@ -298,14 +296,16 @@ def create_rainfall_dataset(df_windfield):
 
             # Merge grid statistics with grid data
             grid_merged = pd.concat([grid_transformed, grid_stats], axis=1)
-            # Set appropriate date and time information (modify as per GEFS data format)
+            # Set appropriate date and time information
+            # (modify as per GEFS data format)
             grid_merged["date"] = forecast_date.strftime(
                 "%Y%m%d%H"
             )  # Format date as string
             grid_merged = grid_merged[["id", "max", "mean", "date"]]
             grid_list.append(grid_merged)
 
-            # Save the processed data. Name file by time and put in folder 06 or 24 regarding rainfall accumulation.
+            # Save the processed data. Name file by time and put in
+            # folder 06 or 24 regarding rainfall accumulation.
             grid_date = forecast_date.strftime("%Y%m%d%H")
             if gefs_file[:-5].endswith("06"):
                 # Set out dir
@@ -397,7 +397,9 @@ def create_rainfall_dataset(df_windfield):
                 / str("gridstats_" + stats + ".csv")
             )
 
-            # Focus on event dates (df_rainfall_06.iloc[3:] and df_rainfall_24.iloc[1:] have the same columns)
+            # Focus on event dates
+            # (df_rainfall_06.iloc[3:] and df_rainfall_24.iloc[1:]
+            # have the same columns)
             available_dates_t = [
                 date
                 for date in df_rainfall_24.columns[1:]
@@ -448,7 +450,7 @@ def create_input_dataset(df_windfield, df_rainfall):
     df_stationary = get_stationary_data_fiji()
 
     # Focus on Fiji
-    fiji_forecast = df_windfield[df_windfield.in_fiji == True]
+    fiji_forecast = df_windfield[df_windfield.in_fiji]
 
     # drop nans (explained in the last part of the rainfall_data.ipynb)
     df_rainfall = df_rainfall.dropna()

@@ -1,10 +1,9 @@
 import os
 from pathlib import Path
+
 import geopandas as gpd
-from shapely.geometry import Polygon
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+from shapely.geometry import Polygon
 
 input_dir = (
     Path(os.getenv("STORM_DATA_DIR"))

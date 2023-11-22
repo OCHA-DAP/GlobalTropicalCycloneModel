@@ -1,10 +1,5 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from xgboost.sklearn import XGBRegressor
-
 from utils import get_combined_dataset, get_municipality_grids
-from input_dataset import create_input_dataset, create_windfield_dataset
+from xgboost.sklearn import XGBRegressor
 
 
 def load_datasets():
@@ -17,7 +12,7 @@ def load_datasets():
         {"mean_elev": "mean_altitude", "total_houses": "total_buildings"},
         axis=1,
     )
-    df_fji = df_combined[df_combined.country == "fji"]
+    # df_fji = df_combined[df_combined.country == "fji"]
 
     # Features with Rainfall
     features_drop = [
@@ -39,22 +34,22 @@ def apply_model(list_forecast):
     grid_mun, df_combined, features_drop = load_datasets()
 
     # Fiji weight
-    fji_weight = 2
+    # fji_weight = 2
     list_df_out = []
     for forecast in list_forecast:
         # Definfe train/test
         df_test = forecast
-        df_train = df_combined.copy()
+        # df_train = df_combined.copy()
 
         # Class weight
-        weights = np.where(
-            df_train["country"] == "phl", 1, fji_weight
-        )  # Let's give more weight to Fiji
+        # weights = np.where(
+        #     df_train["country"] == "phl", 1, fji_weight
+        # )  # Let's give more weight to Fiji
 
         # Split X and y from dataframe features
         X_test = df_test[features_drop]
-        X_train = df_train[features_drop]
-        y_train = df_train["percent_houses_damaged"]
+        # X_train = df_train[features_drop]
+        # y_train = df_train["percent_houses_damaged"]
 
         # create an XGBoost Regressor
         xgb = XGBRegressor(
@@ -88,14 +83,14 @@ def apply_model(list_forecast):
         )
 
         # Fit it on the training set
-        eval_set = [(X_train, y_train)]
-        xgb_model = xgb.fit(
-            X_train,
-            y_train,
-            eval_set=eval_set,
-            verbose=False,
-            sample_weight=weights,
-        )  # xgb_model
+        # eval_set = [(X_train, y_train)]
+        # xgb_model = xgb.fit(
+        #     X_train,
+        #     y_train,
+        #     eval_set=eval_set,
+        #     verbose=False,
+        #     sample_weight=weights,
+        # )  # xgb_model
 
         # Make predictions on new data
         y_pred = xgb.predict(X_test)
@@ -103,7 +98,10 @@ def apply_model(list_forecast):
         # Join with forecast
         df_test["perc_dmg_pred"] = y_pred
 
-        # Set damage predicted < 0 to 0 -- Just if you want -- In some extreme cases (typhoons), the damage is always > 0
+        # Set damage predicted < 0 to 0 --
+        # Just if you want --
+        # In some extreme cases (typhoons), the damage is always > 0
+
         # df_test.loc[df_test['perc_dmg_pred'] < 0, 'perc_dmg_pred'] = 0
 
         # Agreggate by municipality
