@@ -157,3 +157,9 @@ cython_debug/
 
 # Ignore IPython Notebook files
 *.ipynb
+
+# Ignore images (some of the notebooks create and save images)
+*.png
+
+# Ignore CSVs (some of the notebooks create and save CSVs in this directory)
+*.csv
