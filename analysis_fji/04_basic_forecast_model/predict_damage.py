@@ -18,7 +18,7 @@ def load_datasets():
         }, axis=1)
     df_fji = df_combined[df_combined.country == 'fji']
 
-    # Features with Rainfall
+    # Features with Rainfall (user can play with adding or deleting features here)
     features_drop = [
         "wind_speed",
         "track_distance",
@@ -96,10 +96,10 @@ def apply_model(list_forecast):
         # Set damage predicted < 0 to 0 -- Just if you want -- In some extreme cases (typhoons), the damage is always > 0
         #df_test.loc[df_test['perc_dmg_pred'] < 0, 'perc_dmg_pred'] = 0
 
-        # Agreggate by municipality
+        # Agreggate by municipality (basically the sum over all % damage predicted by grid for all grids in a municipality)
         dmg_by_mun = grid_mun.merge(df_test, left_on='id', right_on='grid_point_id')[
             ['NAME_2','perc_dmg_pred']
-            ].groupby('NAME_2').mean().reset_index().rename({
+            ].groupby('NAME_2').sum().reset_index().rename({
                 'NAME_2':'municipality'
             }, axis=1)
 

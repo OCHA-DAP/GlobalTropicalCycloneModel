@@ -24,7 +24,7 @@ from rasterstats import zonal_stats
 
 from utils import get_stationary_data_fiji
 
-def create_windfield_dataset(thres=120):
+def create_windfield_dataset(thres=120, deg=3):
     output_dir = (
         Path(os.getenv("STORM_DATA_DIR"))
         / "analysis_fji/02_new_model_input/02_housing_damage/output/"
@@ -41,7 +41,6 @@ def create_windfield_dataset(thres=120):
     # Modify each of the event based on threshold
     n_events = len(tc_fcast.data)
     # Threshold
-    thres = 120 #h
     today = datetime.now()
     # Calculate the threshold datetime from the current date and time
     threshold_datetime = np.datetime64(today + timedelta(hours=thres))
@@ -66,7 +65,7 @@ def create_windfield_dataset(thres=120):
     event_names = list(tc.event_name)
 
     # Define the boundaries for Fiji region
-    xmin, xmax, ymin, ymax = 176, 182, -21, -12
+    xmin, xmax, ymin, ymax = 176-deg, 182+deg, -21-deg, -12+deg
     fiji_polygon = Polygon([(xmin, ymin), (xmin, ymax), (xmax, ymax), (xmax, ymin)])
 
     df_windfield = pd.DataFrame()
@@ -78,7 +77,7 @@ def create_windfield_dataset(thres=120):
 
         # Track distance
         DEG_TO_KM = 111.1
-        tc_track = tc_fcast.get_track()[i]
+        tc_track = tc_fcast_mod.get_track()[i]
         points = gpd.points_from_xy(tc_track.lon, tc_track.lat)
         tc_track_line = LineString(points)
         tc_track_distance = grids["geometry"].apply(
@@ -114,6 +113,12 @@ def create_windfield_dataset(thres=120):
 
     return df_windfield
 
+def trigger_fji(df_windfield):
+    length = len(df_windfield[df_windfield.in_fiji == True]) # In Fiji
+    if length == 0:
+        return False
+    else:
+        return True
 
 def download_gefs_data(download_folder):
     # Calculate the current date

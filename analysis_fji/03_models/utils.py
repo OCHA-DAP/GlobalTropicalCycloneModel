@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.metrics import mean_squared_error
 from xgboost.sklearn import XGBRegressor
 
+
 RS_BASE = 12345
 
 
@@ -27,7 +28,7 @@ def get_training_dataset_complete():
 
 def get_training_dataset_phl():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
     )
     filename = input_dir / "new_model_training_dataset.csv"
     return pd.read_csv(filename)
@@ -38,7 +39,6 @@ def get_stationary_data_fiji():
     )
     filename = input_dir / "fiji_stationary_data.csv"
     return pd.read_csv(filename)
-
 
 def get_combined_dataset():
     # Load both datasets
@@ -105,6 +105,7 @@ def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weigh
 
         # LOOCV
         df_test = df_fji[df_fji["typhoon_name"] == typhoon] # Test set: Fiji
+        #df_test = df_combined[df_combined["typhoon_name"] == typhoon] # Test set: Fiji
         df_train = df_combined[df_combined["typhoon_name"] != typhoon] # Train set: everything
 
         # Class weight
@@ -152,8 +153,7 @@ def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weigh
             random_state=0,
         )
 
-
-        # fit it on the training set
+        # Fit the model
         eval_set = [(X_train, y_train)]
         xgb.fit(X_train, y_train, eval_set=eval_set, verbose=False, sample_weight=weights) #xgb_model
 

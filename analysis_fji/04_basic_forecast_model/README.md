@@ -19,9 +19,13 @@ Here we create 3 important functions:
 -  create_input_dataset()
 
 
-```create_windfield_dataset()``` loads ECMWF real-time forecasts, and merge it with the grid cells dataset that we have defined in *02_new_model_input*. Also if the forecast event took place in Fiji, a new feature *in_fiji* is set True. To define the Fiji region, we create a polygon (a square) with a custom size and if any point of the forecast track falls into this square, we automatically set that forecast as Fiji-related. The user can obviously play with the dimension of this square.
+```create_windfield_dataset(thres=120, deg=3)``` loads ECMWF real-time forecasts, and merge it with the grid cells dataset that we have defined in *02_new_model_input*. Also if the forecast event took place in Fiji, a new feature *in_fiji* is set True. To define the Fiji region, we create a polygon (a square) with a custom size and if any point of the forecast track falls into this square, we automatically set that forecast as Fiji-related. The user can obviously play with the dimension of this square.
 
-Also, the user can set a threshold in hours (thres): this threshold let the user to just consider datapoints up to a certain time in hours starting from the collection datetime of the data. The default value is 120h. So every wind forecast that the ECMWF provides is cut to just consider wind paths that just contemplates datapoints values up to 120h. Also, a wind path is considered just if it has at least 4 datapoints.
+Parameters:
+
+*thres*: The user can set a threshold in hours: this threshold let the user to just consider datapoints up to a certain time in hours starting from the collection datetime of the data. The default value is 120h. So every wind forecast that the ECMWF provides is cut to just consider wind paths that just contemplates datapoints values up to 120h. Also, a wind path is considered just if it has at least 4 datapoints.
+
+*deg*: Degrees to consider to extend the Polygone (in evey direction). By default, a polygone with coordinates (long_min, long_max, lat_min, lat_max) = (176, 182, -21, -12) is set. What *deg* does is basically a transformation (176-deg, 182+deg, -21-deg, -12+deg).
 
 
 ```create_windfield_dataset()``` uses NOMADS real-time rainfall data and compute the max rainfall accumulated in 6h and 24h periods for every grid cell. The output is a .csv of rainfall data for each wind event event that takes place in Fiji.
@@ -36,6 +40,10 @@ Here we define the function ```apply_model()```. This function considers as inpu
 **Output**: a list of datasets of predicted damage by province.
 
 **Note**: The damage in some grid cells are <0. This is notorious specially if we're not using real typhoons windspeed data. If we use real typhoon windspeed data, in the regions affected, the damage is always >0. I don't want to put any constrains on this, but if you want, you can set all values of predicted damage < 0 to 0 just by uncommentening line 96 in the *predict_damage.py* script.
+
+### Code: main_script.py
+
+Automatization code for running everything. Here: *thres*=120h and *deg*=3 degrees. The output is a list of .csv for each forecast.
 
 ---
 

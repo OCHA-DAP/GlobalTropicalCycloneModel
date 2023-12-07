@@ -27,7 +27,7 @@ def get_training_dataset_complete():
 
 def get_training_dataset_phl():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
     )
     filename = input_dir / "new_model_training_dataset.csv"
     return pd.read_csv(filename)
@@ -75,6 +75,13 @@ def get_combined_dataset():
     df_combined.loc[df_combined["percent_houses_damaged"] > 100, "percent_houses_damaged"] = 100
 
     return df_combined
+
+def get_municipality_grids():
+    input_dir = (
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/02_new_model_input/02_housing_damage/input"
+    )
+    filename = input_dir / "grid_municipality_info.csv"
+    return pd.read_csv(filename)
 
 def xgb_model_combined_data_LOOCV(df_combined, df_fji, features, bins, fji_weight):
     # Dataframe Fiji
