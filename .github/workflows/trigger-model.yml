@@ -1,6 +1,9 @@
 name: Building Damage Forecast Workflow
 
 on:
+  push:
+    branches:
+      - fiji-fede-implementation
   workflow_dispatch: # Manually trigger the workflow
   # schedule:
   #   - cron: '0 0 * * *' # Runs at midnight UTC daily
