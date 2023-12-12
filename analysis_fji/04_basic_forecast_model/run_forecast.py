@@ -15,10 +15,11 @@ def main():
 
     # Get today's date in YYMMDD format
     today_date = datetime.now().strftime("%Y%m%d")
-    # Getting data from ECMWF
-    df_windfield = create_windfield_dataset(thres=120, deg=3)
 
     try:
+        # Getting data from ECMWF
+        df_windfield = create_windfield_dataset(thres=120, deg=3)
+    
         # Check if some forecasts take place on Fiji
         trigger = trigger_fji(df_windfield=df_windfield)
 
