@@ -1,0 +1,41 @@
+name: Building Damage Forecast Workflow
+
+on:
+  workflow_dispatch: # Manually trigger the workflow
+  # schedule:
+  #   - cron: '0 0 * * *' # Runs at midnight UTC daily
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: fiji-fede-implementation # Checkout the specific branch
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11.5'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Set up data directory
+        run: |
+          echo "STORM_DATA_DIR=$(pwd)/data" >> $GITHUB_ENV
+
+      - name: Run Python script
+        run: |
+          python analysis_fji/04_basic_forecast_model/run_forecast.py
+
+      - name: Save output as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: forecast-output
+          path: |
+            output_*.txt
+            output_*.zip

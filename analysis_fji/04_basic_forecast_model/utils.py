@@ -39,7 +39,6 @@ def get_stationary_data_fiji():
     filename = input_dir / "fiji_stationary_data.csv"
     return pd.read_csv(filename)
 
-
 def get_combined_dataset():
     # Load both datasets
     df_fji = get_training_dataset_complete()

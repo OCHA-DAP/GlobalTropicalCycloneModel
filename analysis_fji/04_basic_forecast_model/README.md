@@ -41,9 +41,9 @@ Here we define the function ```apply_model()```. This function considers as inpu
 
 **Note**: The damage in some grid cells are <0. This is notorious specially if we're not using real typhoons windspeed data. If we use real typhoon windspeed data, in the regions affected, the damage is always >0. I don't want to put any constrains on this, but if you want, you can set all values of predicted damage < 0 to 0 just by uncommentening line 96 in the *predict_damage.py* script.
 
-### Code: main_script.py
+### Code: run_forecast.py
 
-Automatization code for running everything. Here: *thres*=120h and *deg*=3 degrees. The output is a list of .csv for each forecast.
+Automatization code for running everything. Here: *thres*=120h and *deg*=3 degrees. The output is either a list of .csv for each forecast (inside a .zip file) or a .txt file with a 'Trigger not activated' message.
 
 ---
 
