@@ -1,10 +1,10 @@
 name: Building Damage Forecast Workflow
 
 on:
-  push:
-    branches:
-      - fiji-fede-implementation
   workflow_dispatch: # Manually trigger the workflow
+  # push:
+  #   branches:
+  #     - fiji-fede-implementation
   # schedule:
   #   - cron: '0 0 * * *' # Runs at midnight UTC daily
 
@@ -41,4 +41,4 @@ jobs:
           name: forecast-output
           path: |
             output_*.txt
-            output_*.zip
+            output_*
