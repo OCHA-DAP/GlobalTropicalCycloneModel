@@ -59,17 +59,17 @@ def main():
                 df_aux['forecast_time_end'] = [time_end] * npoints
                 list_output.append(df_aux)
                 # Create artifact folder with CSV files
-                artifact_folder = Path(f'outputs_{today_date}')
+                artifact_folder = Path(f'output_{today_date}')
                 artifact_folder.mkdir(parents=True, exist_ok=True)
                 # Save each generated DataFrame as a CSV file within 'outputs_YYMMDD'
                 for i, df_out in enumerate(list_output):
                     df_out.to_csv(artifact_folder /f'output_{i}.csv', index=False)
 
-                # Zip the folder
-                with zipfile.ZipFile(f'outputs_{today_date}.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
-                    for root, _, files in os.walk(artifact_folder):
-                        for file in files:
-                            zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), artifact_folder))
+                # # Zip the folder
+                # with zipfile.ZipFile(f'output_{today_date}.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
+                #     for root, _, files in os.walk(artifact_folder):
+                #         for file in files:
+                #             zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), artifact_folder))
 
         else:
             # Create a TXT file with a message
