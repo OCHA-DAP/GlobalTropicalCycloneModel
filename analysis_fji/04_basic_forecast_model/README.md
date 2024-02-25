@@ -56,3 +56,7 @@ Automatization code for running everything. Here: *thres*=120h and *deg*=3 degre
 - In *rainfall_data.ipynb* is everything regarding the rainfall forecast data: the downloading and the processing of the data.
 
 - In *apply_model.ipynb* we have 2 sections: Manual process and Automated Process. The Manual section is left for completeness but I encourage anyone to use the Automated Process section. In this section we use all the functions that we have already defined to predict damage at municipality-level based on ECMWF forecasts in Fiji.
+
+---
+
+Check trigger by editing this last sentence (until we set up and schedule)
