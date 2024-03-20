@@ -12,14 +12,12 @@ from predict_damage import apply_model
 import zipfile
 
 def main():
-
     # Get today's date in YYMMDD format
     today_date = datetime.now().strftime("%Y%m%d")
-
     try:
         # Getting data from ECMWF
         df_windfield = create_windfield_dataset(thres=120, deg=3)
-    
+
         # Check if some forecasts take place on Fiji
         trigger = trigger_fji(df_windfield=df_windfield)
 
@@ -30,7 +28,7 @@ def main():
             # Load rainfall data (only if there are some wind forecasts on Fiji)
             rain_dir = (
                 Path(os.getenv("STORM_DATA_DIR"))
-                / "analysis_fji/02_new_model_input/03_rainfall/output"
+                / "analysis_fji/02_model_features/03_rainfall/output"
             )
 
             filename = rain_dir / "NOMADS"/ today_date /"rainfall_data_rw_mean.csv"
@@ -65,7 +63,7 @@ def main():
                 for i, df_out in enumerate(list_output):
                     df_out.to_csv(artifact_folder /f'output_{i}.csv', index=False)
 
-                # # Zip the folder
+                # Zip the folder
                 # with zipfile.ZipFile(f'output_{today_date}.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
                 #     for root, _, files in os.walk(artifact_folder):
                 #         for file in files:

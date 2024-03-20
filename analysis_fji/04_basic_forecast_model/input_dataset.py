@@ -27,7 +27,7 @@ from utils import get_stationary_data_fiji
 def create_windfield_dataset(thres=120, deg=3):
     output_dir = (
         Path(os.getenv("STORM_DATA_DIR"))
-        / "analysis_fji/02_new_model_input/02_housing_damage/output/"
+        / "analysis_fji/02_model_features/02_housing_damage/output/"
         )
 
     # Load grids
@@ -170,17 +170,17 @@ def create_rainfall_dataset(df_windfield):
     # Setting directories
     input_dir = (
         Path(os.getenv("STORM_DATA_DIR"))
-        / "analysis_fji/02_new_model_input/03_rainfall/input"
+        / "analysis_fji/02_model_features/03_rainfall/input"
     )
 
     output_dir = (
         Path(os.getenv("STORM_DATA_DIR"))
-        / "analysis_fji/02_new_model_input/03_rainfall/output"
+        / "analysis_fji/02_model_features/03_rainfall/output"
     )
 
     grid_input = (
         Path(os.getenv("STORM_DATA_DIR"))
-        / "analysis_fji/02_new_model_input/02_housing_damage/output/"
+        / "analysis_fji/02_model_features/02_housing_damage/output/"
     )
 
     # Focus on Fiji

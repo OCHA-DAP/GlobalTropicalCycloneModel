@@ -1,17 +1,3 @@
----
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.15.2
-  kernelspec:
-    display_name: env1
-    language: python
-    name: env1
----
-
 ```python
 import statistics
 
@@ -37,11 +23,13 @@ from utils import get_training_dataset_complete
 
 # Data cleaning and stratification
 
+
 ```python
 df_complete = get_training_dataset_complete()
 df = df_complete.copy()
 df = df.rename({'perc_dmg_grid':'percent_houses_damaged', 'total_buildings':'total_houses'}, axis=1)
 ```
+
 
 ```python
 # Set any values of damage houses >100% to 100% .. ok
@@ -50,11 +38,13 @@ for r in range(len(df)):
         df.at[r, "percent_houses_damaged"] = float(100)
 ```
 
+
 ```python
 #drop windspeed = 0
 # df = (df[(df[["wind_speed"]] != 0).any(axis=1)]).reset_index(drop=True)
 # df = df.drop(columns=["grid_point_id", "typhoon_year_y", "typhoon_year"])
 ```
+
 
 ```python
 #what about rainfall data? Lets drop all 0 values.
@@ -64,6 +54,7 @@ for r in range(len(df)):
 ```
 
 ### Stratification: 3 possible values
+
 
 ```python
 fig, ax = plt.subplots(1,2, figsize=(10,6))
@@ -88,6 +79,13 @@ plt.tight_layout()
 plt.show()
 ```
 
+
+
+![png](03_model_classification_method_files/03_model_classification_method_7_0.png)
+
+
+
+
 ```python
 # Distribution of information
 dmg = np.array(df.percent_houses_damaged.to_list())
@@ -107,7 +105,14 @@ plt.grid()
 plt.show()
 ```
 
+
+
+![png](03_model_classification_method_files/03_model_classification_method_8_0.png)
+
+
+
 So we have ~50% of the data with 0 damage and ~90% with < 1% damage
+
 
 ```python
 conditions = [
@@ -121,9 +126,22 @@ values = [0, 1, 2]
 df['damage_classification'] = np.select(conditions, values)
 ```
 
+
 ```python
 df['damage_classification'].value_counts()
 ```
+
+
+
+
+    damage_classification
+    1    1886
+    0    1772
+    2      50
+    Name: count, dtype: int64
+
+
+
 
 ```python
 df['damage_classification'].hist()
@@ -134,7 +152,14 @@ plt.title('Distribution of damage')
 plt.show()
 ```
 
+
+
+![png](03_model_classification_method_files/03_model_classification_method_12_0.png)
+
+
+
 # Define plot function
+
 
 ```python
 def cm_plot(cms, accuracy, f1score, model_name):
@@ -179,6 +204,7 @@ def cm_plot(cms, accuracy, f1score, model_name):
 
 # Models
 
+
 ```python
 # List of typhoons
 typhoons = df.typhoon_name.unique()
@@ -199,6 +225,7 @@ features = [
 ```
 
 ## XGB Classifier -no standardize-
+
 
 ```python
 cms_xgb = []
@@ -243,11 +270,19 @@ for typhoon in typhoons:
 
 ```
 
+
 ```python
 cm_plot(cms_xgb, accuracy_xgb, f1score_xgb, 'XGBoost')
 ```
 
+
+
+![png](03_model_classification_method_files/03_model_classification_method_19_0.png)
+
+
+
 ## XGB Classifier (standardize data)
+
 
 ```python
 cms_xgb_s = []
@@ -295,11 +330,19 @@ for typhoon in typhoons:
     f1score_xgb_s.append(f1)
 ```
 
+
 ```python
 cm_plot(cms_xgb_s, accuracy_xgb_s, f1score_xgb_s, 'XGBoost (standardized)')
 ```
 
+
+
+![png](03_model_classification_method_files/03_model_classification_method_22_0.png)
+
+
+
 ## LogReg classifier
+
 
 ```python
 cms_logreg = []
@@ -349,11 +392,19 @@ for typhoon in typhoons:
 
 ```
 
+
 ```python
 cm_plot(cms_logreg, accuracy_logreg, f1score_logreg, 'Logistic Regression')
 ```
 
+
+
+![png](03_model_classification_method_files/03_model_classification_method_25_0.png)
+
+
+
 ## Random Forest Classifier
+
 
 ```python
 cms_random_forest = []
@@ -403,6 +454,11 @@ for typhoon in typhoons:
 
 ```
 
+
 ```python
 cm_plot(cms_random_forest, accuracy_random_forest, f1score_random_forest, 'Random Forest')
 ```
+
+
+
+![png](03_model_classification_method_files/03_model_classification_method_28_0.png)

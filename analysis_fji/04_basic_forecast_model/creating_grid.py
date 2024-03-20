@@ -8,7 +8,7 @@ import pandas as pd
 
 input_dir = (
     Path(os.getenv("STORM_DATA_DIR"))
-    / "analysis_fji/02_new_model_input/02_housing_damage/input/"
+    / "analysis_fji/02_model_features/02_housing_damage/input/"
     )
 
 # Load Fiji

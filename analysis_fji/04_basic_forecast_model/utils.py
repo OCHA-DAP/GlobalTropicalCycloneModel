@@ -13,28 +13,28 @@ RS_BASE = 12345
 
 def get_training_dataset():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_model_input_dataset"
     )
     filename = input_dir / "new_model_training_dataset_fji.csv"
     return pd.read_csv(filename)
 
 def get_training_dataset_complete():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_model_input_dataset"
     )
     filename = input_dir / "new_model_training_dataset_fji_complete.csv"
     return pd.read_csv(filename)
 
 def get_training_dataset_phl():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_model_input_dataset"
     )
     filename = input_dir / "new_model_training_dataset.csv"
     return pd.read_csv(filename)
 
 def get_stationary_data_fiji():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_new_model_training"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/03_model_input_dataset"
     )
     filename = input_dir / "fiji_stationary_data.csv"
     return pd.read_csv(filename)
@@ -77,7 +77,7 @@ def get_combined_dataset():
 
 def get_municipality_grids():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/02_new_model_input/02_housing_damage/input"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_fji/02_model_features/02_housing_damage/input"
     )
     filename = input_dir / "grid_municipality_info.csv"
     return pd.read_csv(filename)
