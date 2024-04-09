@@ -1,8 +1,7 @@
 name: Building Damage Forecast Workflow
 
 on:
-  # This just works on main branch
-  workflow_dispatch: # Manually trigger the workflow 
+  workflow_dispatch: # Manually trigger the workflow
   push:
     branches:
       - fiji-fede-implementation
@@ -42,4 +41,4 @@ jobs:
           name: forecast-output
           path: |
             output_*.txt
-            output_*
+            output_*.zip

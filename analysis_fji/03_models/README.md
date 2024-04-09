@@ -75,3 +75,33 @@ In 04.3_simple_model_combined_data_no_rainfall.ipynb we measure the influence of
 In 05.0_combined_model.ipynb we aggregate damage at municipality level and display damage maps.
 
 In 05.1_combined_model_feature_importance.ipynb we calculate the feature_importance using the build-in feature from XGBoost for the model with LOOCV (mean values of imoportance per testing typhoon) and for some specific (and impactful) typhoons, like YASA and WINSTON.
+
+### Code 07: Combined model Philippies + Fiji + Vietnam datasets.
+
+In 07.0_combined_model_with_viet.ipynb we add Vietnam to the discussion.
+
+### Code 08: Combined model, different definition of population by grid
+
+In 08.0_combined_model_with_viet_new_bld_count.ipynb we changed the way of distribuiting buildings by grid: We use the urbal-rural index and some fixed quantities to estimates households by grid and we then distribute damage in the usual way. We see how our model responds to these changes and we compare it to the response of the model using the old way of counting buildings (HOTosm dataset).
+
+### Code 09: Combined model, different definition of population by grid (again)
+
+In 09.0_combined_model_with_viet_new_bld_count_using_pop.ipynb we add a new way of distribuiting buildings by grid. Here we use the census data (ArcGIS HUB dataset). We compare the performance of the model with the previous definitions of buildings per grid.
+
+In 09.1_combined_model_with_viet_new_bld_count_using_pop_plus_features.ipynb we use this cesus data to distribuiting damage at grid level AND we add more features (vulnerability features) to the discussion (IWI and Light-Index).
+
+
+### Code 10: Combined model, localized typhoons.
+
+We analyze the performance of the model when considering just geolocalized events for the Vietnam dataset. SPOILER: It's better to just include everything.
+
+### Code 11: Combined model, different weight ratios
+
+We use the combined model again (with the IWI feature) and iterate to different weight ratios. The idea is to find the best parameters that:
+
+-  Minimize the total RMSE
+-  Minimize the RMSE of the high-damage bin.
+
+### Code 12: Combined model, final features
+
+In 12.0_combined_model_final_features.ipynb we use and check the performance of the final model with all the features we have for the moment (10 features).

@@ -55,14 +55,14 @@ def get_training_dataset_complete_interpolated_new_bld_count_using_pop():
 
 def get_training_dataset_phl():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis/03_model_input_dataset"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_phl/03_model_input_dataset"
     )
     filename = input_dir / "new_model_training_dataset_phl_new.csv"
     return pd.read_csv(filename)
 
 def get_training_dataset_viet():
     input_dir = (
-        Path(os.getenv("STORM_DATA_DIR")) / "analysis_viet/03_model_input_dataset"
+        Path(os.getenv("STORM_DATA_DIR")) / "analysis_vnm/03_model_input_dataset"
     )
     filename = input_dir / "new_model_training_dataset_viet_complete_interpolated_wind.csv"
     return pd.read_csv(filename)

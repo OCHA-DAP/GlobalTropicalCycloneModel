@@ -60,3 +60,11 @@ Here we get the Mean International wealth index (IWI) from [globaldatalab](https
 In 05.0_relative_wealth_index.ipynb we calculate the IWI at grid level.
 
 Output: dataset of IWI at grid level.
+
+### Code 06: Population data
+
+We explore population dataset and urban-rural dataset. The idea is to get an accurate estimation of people per grid. Finally, we managed to get our hands on some Census data. Here, we not only got information about population but also about households by grid.
+
+### Code 07: Light-index indicator
+
+We tried to create a vulnerability index based on brightness levels of night satellite images.
